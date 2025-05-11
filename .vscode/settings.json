@@ -1,0 +1,5 @@
+{
+    "move-analyzer.server.path": "/Users/vigneshkaleeswaran/.cargo/bin/move-analyzer",
+    "sui-move-analyzer.server.path": "/Users/vigneshkaleeswaran/.cargo/bin/move-analyzer",
+    "liveServer.settings.multiRootWorkspaceName": "suiContract"
+}
