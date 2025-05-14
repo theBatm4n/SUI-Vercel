@@ -4,89 +4,36 @@ import { fromBase64 } from '@mysten/sui/utils';
 import { getFullnodeUrl, SuiClient } from '@mysten/sui/client';
 import path, { dirname } from 'path';
 import { execSync } from 'child_process';
+import { existsSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { Transaction } from '@mysten/sui/transactions';
-import ContractService from './services/contractservice.js'; 
 
-export async function token_mint(){
-	/*
-	const publishID = token_deploy(
-		'MyAgentdemo',    // module_name
-		'DEM',         // token_symbol 
-		'Agent Token DEMO', // token_name
-		9,             // decimals
-		'AI trading bot sui',  // description
-		1000000000000 //initial_supply
-	);
-	console.log('Token created with ID:', publishID);
-	*/
-	const client = new SuiClient({
-		url: getFullnodeUrl('testnet'),
-	});
-
-	const res = await client.getOwnedObjects({
-        owner: "0x03f3c5b496a3587aa81b13d70c0681f3b468a6d282fa962b4a2db4ebec16fa6c",
-        filter: {
-            MatchAny: [
-                {
-                    StructType: "0xcca2795809a5a0327228eb430e578e2c4445d1af112b5eb4264b65ff8785c06d::aicoin::MyAgentdemoCap"
-                },
-            ],
-        },
-        options: {
-            showType: true,
-        },
-    });
-
-	const priv_key = process.env.PRIVATE_KEY;
-	if (!priv_key) {
-		console.log('Error: Priv Key not set in env');
-		process.exit(1);
-	}
-	// Generate a new Ed25519 Keypair
-	const keypair = Ed25519Keypair.fromSecretKey(fromBase64(priv_key).slice(1));
-
-	const tx = new Transaction();
-    // Define inputs (replace these with your actual values)
-	const minterCapArg = res.data[0].data.objectId; // Object ID of MyAgentdemoCap
-	console.log('Minter Cap:', minterCapArg);
-	const amount = 1000;          // Amount to mint (u64)
-	const recipient = "0x03f3c5b496a3587aa81b13d70c0681f3b468a6d282fa962b4a2db4ebec16fa6c";    // Recipient address
-
-	// Add the moveCall with 3 arguments
-	tx.moveCall({
-	target: `0xcca2795809a5a0327228eb430e578e2c4445d1af112b5eb4264b65ff8785c06d::aicoin::mint`,
-	arguments: [
-		tx.object(minterCapArg),  // minter_cap (object reference)
-		tx.object(amount),   // amount (u64)
-		tx.object(recipient), // recipient (address)
-	],
-	});
-
-	// Execute transaction
-	const result = await provider.signAndExecuteTransactionBlock({
-	signer: keypair,
-	transactionBlock: tx,
-	options: {
-		showEffects: true,
-		showEvents: true,
-	},
-	});
-  
-    console.log(result);
-}
-
-export async function token_deploy(module_name, token_symbol, token_name, decimals, description) {
+export async function token_deploy(module_name, token_symbol, token_name, decimals, description, initial_amount, package_dir, privateKey) {
+	console.log('Deploying token to SUI network');
     try {
-		const command = `./generate_move.sh ${module_name} ${token_symbol} "${token_name}" ${decimals} "${description}"`;
-        
-        // Execute with proper escaping
+
+		// Properly escape all parameters for shell execution
+        const escaped = {
+            module_name: module_name.replace(/'/g, "'\\''"),
+            token_symbol: token_symbol.replace(/'/g, "'\\''"),
+            token_name: token_name.replace(/'/g, "'\\''"),
+            description: description.replace(/'/g, "'\\''"),
+            package_dir: package_dir.replace(/'/g, "'\\''")
+        };
+
+		if (existsSync(package_dir)) {
+			throw new Error(`Directory "${package_dir}" already exists! Aborting to prevent overwriting.`);
+		}
+
+        const command = `./generate_move.sh '${escaped.module_name}' '${escaped.token_symbol}' '${escaped.token_name}' ${decimals} '${escaped.description}' ${initial_amount} '${escaped.package_dir}'`;
+		console.log('Executing:', command); // Debug output
+
         execSync(command, {
             stdio: 'inherit',
             shell: true
         });
 
-		const priv_key = process.env.PRIVATE_KEY;
+		const priv_key = privateKey;
 		if (!priv_key) {
 			console.log('Error: Priv Key not set in env');
 			process.exit(1);
@@ -98,7 +45,7 @@ export async function token_deploy(module_name, token_symbol, token_name, decima
             url: lin,
         });
         // Path to your Move project directory (contains Move.toml)
-		const path_to_contract = path.join(dirname(fileURLToPath(import.meta.url)), './Token/sources');
+		const path_to_contract = path.join(dirname(fileURLToPath(import.meta.url)), `./${package_dir}/sources`);
 		console.log('Building contract');
 		
         const { dependencies, modules } = JSON.parse(
@@ -142,11 +89,11 @@ export async function token_deploy(module_name, token_symbol, token_name, decima
 		console.log("Result: ", result);
 
 		 // Extract contract address from the result
-		 const contractAddress = result.objectChanges.find(
-			change => change.type === 'created' && change.objectType.includes('::')
-		)?.objectId;
+		 const PackageID = result.objectChanges.find(
+			change => change.type === 'published'
+		)?.packageId;
 
-		if (!contractAddress) {
+		if (!PackageID) {
 			throw new Error('Could not extract contract address from deployment result');
 		}
 
@@ -155,11 +102,11 @@ export async function token_deploy(module_name, token_symbol, token_name, decima
 			name: token_name,
 			symbol: token_symbol,
 			description: description,
-			contractAddress: contractAddress,
+			PackageID: PackageID,
 			owner: keypair.toSuiAddress(),
 			decimals: decimals,
-			transactionData: result, // Optional: include full transaction data
-			date: new Date() // Current timestamp
+			transactionData: result, 
+			date: new Date() 
 		};
 		
 		}

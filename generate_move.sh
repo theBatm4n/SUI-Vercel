@@ -1,15 +1,15 @@
 #!/bin/bash
 
-# Set default values
-MODULE_NAME=${1:-"AIagent"}
-TOKEN_SYMBOL=${2:-"MYT"}
-TOKEN_NAME=${3:-"My Custom Token"}
-DECIMALS=${4:-"9"}
-DESCRIPTION=${5:-"A utility token for AI services"}
-INITIAL_AMOUNT=${6:-"100000000000"}
+# Set values
+MODULE_NAME=$1
+TOKEN_SYMBOL=$2
+TOKEN_NAME=$3
+DECIMALS=$4
+DESCRIPTION=$5
+INITIAL_AMOUNT=$6
+PACKAGE_DIR=$7
 
 # Directory structure
-PACKAGE_DIR="Token"
 SOURCES_DIR="${PACKAGE_DIR}/sources"
 OUTPUT_FILE="${SOURCES_DIR}/${MODULE_NAME}.move"
 
@@ -130,4 +130,6 @@ echo "Successfully generated:"
 echo "- Move file: ${OUTPUT_FILE}"
 echo "- Token Symbol: ${TOKEN_SYMBOL}"
 echo "- Decimals: ${DECIMALS}"
+echo "- Description: ${DESCRIPTION}"
+echo "- Initial Amount: ${INITIAL_AMOUNT}"
 echo "- Package structure ready in ${PACKAGE_DIR}/"

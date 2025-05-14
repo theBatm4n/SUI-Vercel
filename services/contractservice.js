@@ -8,7 +8,7 @@ class ContractService {
         Name: contractData.name, 
         Symbol: contractData.symbol, 
         Description: contractData.description, 
-        ContractAddress: contractData.contractAddress, 
+        PackageID: contractData.PackageID, 
         Owner: contractData.owner, 
         Decimals: contractData.decimals
       });;

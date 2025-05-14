@@ -5,7 +5,6 @@ import contractRoutes from './routes/contract.js';
 
 const app = express();
 const port = process.env.PORT || 8080;
-
 // Middleware
 app.use(bodyParser.json());
 
@@ -21,6 +20,7 @@ mongoose.connect(process.env.MONGODB_URI,{
   console.log('MongoDB connected...');
 })
 .catch(err => console.log(err));
+
 
 // Start the server
 app.listen(port, () => {

@@ -13,7 +13,7 @@ const ContractSchema = new mongoose.Schema({
     type: String, 
     required: true 
   },
-  ContractAddress: { 
+  PackageID: { 
     type: String, 
     required: true, 
     unique: true 
