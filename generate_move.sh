@@ -1,7 +1,5 @@
 #!/bin/bash
 
-# Usage: ./generate_token.sh MODULE_NAME TOKEN_SYMBOL TOKEN_NAME DECIMALS DESCRIPTION
-
 # Set default values
 MODULE_NAME=${1:-"AIagent"}
 TOKEN_SYMBOL=${2:-"MYT"}

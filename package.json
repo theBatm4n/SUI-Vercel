@@ -1,8 +1,15 @@
 {
   "type": "module",
+  "scripts": {
+    "start": "node app"
+  },
   "dependencies": {
     "@mysten/sui": "^1.29.1",
+    "@vercel/node": "^5.1.16",
+    "body-parser": "^2.2.0",
     "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "mongoose": "^8.14.2",
     "typescript": "^5.8.3"
   },
   "devDependencies": {
