@@ -4,7 +4,7 @@ import bodyParser from 'body-parser';
 import contractRoutes from './routes/contract.js';
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 8080;
 
 // Middleware
 app.use(bodyParser.json());
@@ -13,7 +13,7 @@ app.use(bodyParser.json());
 app.use('/contracts', contractRoutes);
 
 // MongoDB connection
-mongoose.connect('mongodb+srv://batmanking36:C04MODOv11Dl67Ht@cluster0.bzrytqk.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0', { 
+mongoose.connect(process.env.MONGODB_URI,{ 
   useNewUrlParser: true, 
   useUnifiedTopology: true 
 })
