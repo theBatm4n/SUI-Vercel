@@ -35,7 +35,7 @@ router.post('/deploy', async (req, res) => {
 
     // Validate inputs
     if (!module_name|| !name || !symbol || !description || decimals === undefined || !initial_supply) {
-      return res.status(400).json({ error: 'All fields are required' });
+      return res.status(400).json({ error: 'All fields are required.' });
     }
     if (!privateKey) {
       return res.status(401).json({ error: 'Private key required' });
