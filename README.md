@@ -1,6 +1,6 @@
 Steps:
 
-git clone 
+git clone https://github.com/theBatm4n/SUI-Vercel.git
 
 cd SUI-Vercal
 
