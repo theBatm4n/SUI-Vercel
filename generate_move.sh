@@ -3,11 +3,12 @@
 # Set values
 MODULE_NAME=$1
 TOKEN_SYMBOL=$2
-TOKEN_NAME=$3
-DECIMALS=$4
-DESCRIPTION=$5
-INITIAL_AMOUNT=$6
-PACKAGE_DIR=$7
+SYMBOL_SMALL=$3
+TOKEN_NAME=$4
+DECIMALS=$5
+DESCRIPTION=$6
+INITIAL_AMOUNT=$7
+PACKAGE_DIR=$8
 
 # Directory structure
 SOURCES_DIR="${PACKAGE_DIR}/sources"
@@ -24,7 +25,7 @@ fi
 
 # Create the Move file
 cat <<EOF > "$OUTPUT_FILE"
-module ${MODULE_NAME}::aicoin {
+module ${MODULE_NAME}::${SYMBOL_SMALL}{
     use sui::coin::{Self, Coin};
     use sui::url;
     use sui::event;
@@ -33,11 +34,11 @@ module ${MODULE_NAME}::aicoin {
     /// State variable
     const EInvalidAmount: u64 = 0;
 
-    public struct AICOIN has drop {}
+    public struct ${TOKEN_SYMBOL} has drop {}
 
     public struct ${MODULE_NAME}Cap has key, store {
         id: UID,
-        treasury: coin::TreasuryCap<AICOIN>,
+        treasury: coin::TreasuryCap<${TOKEN_SYMBOL}>,
     }
 
     public struct CoinMetadata has key, store {
@@ -59,7 +60,7 @@ module ${MODULE_NAME}::aicoin {
     }
 
     /// Initializes the token
-    fun init(witness: AICOIN, ctx: &mut TxContext) {
+    fun init(witness: ${TOKEN_SYMBOL}, ctx: &mut TxContext) {
         let (mut treasury_cap, metadata) = coin::create_currency(
             witness,
             ${DECIMALS},
@@ -85,14 +86,14 @@ module ${MODULE_NAME}::aicoin {
         event::emit(MintEvent{amount: amount, recipient: recipient});
     }
 
-    public entry fun burn(minter_cap: &mut ${MODULE_NAME}Cap, c: Coin<AICOIN>){
+    public entry fun burn(minter_cap: &mut ${MODULE_NAME}Cap, c: Coin<${TOKEN_SYMBOL}>){
         let amount = coin::value(&c);
         assert!(amount > 0, EInvalidAmount);
         coin::burn(&mut minter_cap.treasury, c);
         event::emit(BurnEvent { amount: amount })
     }
 
-    public entry fun transfer_token(c: Coin<AICOIN>, recipient: address) {
+    public entry fun transfer_token(c: Coin<${TOKEN_SYMBOL}>, recipient: address) {
         transfer::public_transfer(c, recipient);
     }
 
@@ -102,7 +103,7 @@ module ${MODULE_NAME}::aicoin {
 
     #[test_only]
     public fun test_init(ctx: &mut TxContext) {
-        init(AICOIN {}, ctx)
+        init(${TOKEN_SYMBOL} {}, ctx)
     }
 }
 EOF

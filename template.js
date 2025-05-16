@@ -31,8 +31,10 @@ export async function generateMoveTemplate(
             description: description.replace(/'/g, "'\\''"),
             package_dir: package_dir.replace(/'/g, "'\\''")
         };
+
+        const lowerCaseSymbol = escaped.token_symbol.toLowerCase();
         
-        const command = `"${scriptPath}" '${escaped.module_name}' '${escaped.token_symbol}' '${escaped.token_name}' ${decimals} '${escaped.description}' ${initial_amount} '${escaped.package_dir}'`;
+        const command = `"${scriptPath}" '${escaped.module_name}' '${escaped.token_symbol}' '${lowerCaseSymbol}' '${escaped.token_name}' ${decimals} '${escaped.description}' ${initial_amount} '${escaped.package_dir}'`;
           
           execSync(command, {
               stdio: 'inherit',
@@ -55,7 +57,6 @@ export async function generateMoveTemplate(
                 encoding: 'utf-8'
             })
           );
-          console.log(dependencies, modules);
           if (!modules || !dependencies) {
                 console.log('Failed to build contract: No modules or dependencies found');
             }
@@ -95,7 +96,6 @@ export async function generateMoveTemplate(
               }
           });
 
-          console.log("Result: ", result);
           // Extract contract address
           const PackageID = result.objectChanges.find(
               change => change.type === 'published'
@@ -112,7 +112,7 @@ export async function generateMoveTemplate(
               PackageID: PackageID,
               owner: keypair.toSuiAddress(),
               decimals: decimals,
-              transactionData: result, 
+              transactionData: result.digest, 
               date: new Date() 
           };
           
