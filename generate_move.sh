@@ -119,10 +119,6 @@ Sui = { git = "https://github.com/MystenLabs/sui.git", subdir = "crates/sui-fram
 
 [addresses]
 ${MODULE_NAME} = "0x0"
-
-[dev-dependencies]
-
-[dev-addresses]
 EOF
 fi
 

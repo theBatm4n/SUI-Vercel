@@ -10,8 +10,8 @@ import { mkdtempSync, rmSync } from 'fs';
 
 export async function generateMoveTemplate(
   module_name,
-  token_symbol,
   token_name,
+  token_symbol,
   decimals,
   description,
   initial_amount,
@@ -22,11 +22,17 @@ export async function generateMoveTemplate(
       // Create a temporary directory
       const tempDir = mkdtempSync(join(tmpdir(), 'sui-token-'));
       const package_dir = join(tempDir, module_name);
-      
       try {
-          // Generate files in the temporary directory
-          const command = `./generate_move.sh '${module_name}' '${token_symbol}' '${token_name}' ${decimals} '${description}' ${initial_amount} '${package_dir}'`;
-          console.log('Executing:', command);
+        const scriptPath = join(process.cwd(), 'generate_move.sh');
+        const escaped = {
+            module_name: module_name.replace(/'/g, "'\\''"),
+            token_symbol: token_symbol.replace(/'/g, "'\\''"),
+            token_name: token_name.replace(/'/g, "'\\''"),
+            description: description.replace(/'/g, "'\\''"),
+            package_dir: package_dir.replace(/'/g, "'\\''")
+        };
+        
+        const command = `"${scriptPath}" '${escaped.module_name}' '${escaped.token_symbol}' '${escaped.token_name}' ${decimals} '${escaped.description}' ${initial_amount} '${escaped.package_dir}'`;
           
           execSync(command, {
               stdio: 'inherit',
@@ -39,20 +45,20 @@ export async function generateMoveTemplate(
           }
           
           const keypair = Ed25519Keypair.fromSecretKey(fromBase64(priv_key).slice(1));
-          const lin = getFullnodeUrl('testnet');
           const client = new SuiClient({
-              url: lin,
+              url: getFullnodeUrl('testnet'),
           });
-          
-          // Build the contract from the temporary directory
           console.log('Building contract');
+          // Build the contract from the temporary directory
           const { dependencies, modules } = JSON.parse(
-              execSync(`sui move build --dump-bytecode-as-base64 --path ${package_dir}`, {
-                  encoding: 'utf-8',
-              }),
+            execSync(`sui move build --dump-bytecode-as-base64 --path ${package_dir}`, {
+                encoding: 'utf-8'
+            })
           );
-
-          console.log('Contract built successfully');
+          console.log(dependencies, modules);
+          if (!modules || !dependencies) {
+                console.log('Failed to build contract: No modules or dependencies found');
+            }
           
           // Create and execute transaction
           console.log('Deploying contract');
