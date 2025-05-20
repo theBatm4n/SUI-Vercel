@@ -1,0 +1,26 @@
+# fly.toml app configuration file generated for suicontract-coin on 2025-05-21T04:18:38+08:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = 'suicontract-coin'
+primary_region = 'hkg'
+
+[build]
+
+[env]
+  MONGODB_URI = 'mongodb+srv://batmanking36:C04MODOv11Dl67Ht@cluster0.bzrytqk.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0'
+  PRIVATE_KEY = 'AJB1doINLUSHXFb9oUmPlLcPo4k5czIRTTy9KGlAhX1J'
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = 'stop'
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ['app']
+
+[[vm]]
+  memory = '1gb'
+  cpu_kind = 'shared'
+  cpus = 2

@@ -11,6 +11,10 @@ app.use(bodyParser.json());
 // Routes
 app.use('/contracts', contractRoutes);
 
+if (!process.env.MONGODB_URI) {
+  throw new Error('MONGODB_URI environment variable is required');
+}
+
 // MongoDB connection
 mongoose.connect(process.env.MONGODB_URI,{ 
   useNewUrlParser: true, 
@@ -18,10 +22,8 @@ mongoose.connect(process.env.MONGODB_URI,{
 })
 .then(async () => {
   console.log('MongoDB connected...');
-
 })
 .catch(err => console.log(err));
-
 
 // Start the server
 app.listen(port, '0.0.0.0', () => {

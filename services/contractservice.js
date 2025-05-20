@@ -10,8 +10,9 @@ class ContractService {
         Description: contractData.description, 
         PackageID: contractData.PackageID, 
         Owner: contractData.owner, 
-        Decimals: contractData.decimals
-      });;
+        Decimals: contractData.decimals,
+        url: contractData.url
+      });
       return await contract.save();
     } catch (error) {
       throw new Error(`Error creating contract: ${error.message}`);

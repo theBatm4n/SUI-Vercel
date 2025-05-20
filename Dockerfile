@@ -1,5 +1,5 @@
 # Builder stage: build and install dependencies
-FROM mysten/sui-tools:testnet 
+FROM mysten/sui-tools:mainnet
 
 RUN sui client -y
 

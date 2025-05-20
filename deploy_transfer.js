@@ -8,15 +8,15 @@ import { tmpdir } from 'os';
 import { join } from 'path';
 import { mkdtempSync, rmSync } from 'fs';
 
-export async function generateMoveTemplate(
+export async function deploy_and_transfer(
   module_name,
   token_name,
   token_symbol,
   decimals,
   description,
   initial_amount,
+  transfer_address,
   url,
-  privateKey
 ) {
   console.log('Deploying token to SUI network');
   try {
@@ -24,7 +24,7 @@ export async function generateMoveTemplate(
       const tempDir = mkdtempSync(join(tmpdir(), 'sui-token-'));
       const package_dir = join(tempDir, module_name);
       try {
-        const scriptPath = join(process.cwd(), 'generate_move.sh');
+        const scriptPath = join(process.cwd(), 'generate_transfer_move.sh');
         const escaped = {
             module_name: module_name.replace(/'/g, "'\\''"),
             token_symbol: token_symbol.replace(/'/g, "'\\''"),
@@ -35,14 +35,14 @@ export async function generateMoveTemplate(
 
         const lowerCaseSymbol = escaped.token_symbol.toLowerCase();
         
-        const command = `"${scriptPath}" '${escaped.module_name}' '${escaped.token_symbol}' '${lowerCaseSymbol}' '${escaped.token_name}' ${decimals} '${escaped.description}' ${initial_amount} '${escaped.package_dir}' ${url}`;
+        const command = `"${scriptPath}" '${escaped.module_name}' '${escaped.token_symbol}' '${lowerCaseSymbol}' '${escaped.token_name}' ${decimals} '${escaped.description}' ${initial_amount} '${escaped.package_dir}' '${transfer_address}' '${url}'`;
           
           execSync(command, {
               stdio: 'inherit',
               shell: true
           });
-
-          const priv_key = privateKey;
+          console.log('Command executed');
+          const priv_key = process.env.PRIVATE_KEY;
           if (!priv_key) {
               throw new Error('Private Key not provided');
           }
@@ -111,7 +111,7 @@ export async function generateMoveTemplate(
               symbol: token_symbol,
               description: description,
               PackageID: PackageID,
-              owner: keypair.toSuiAddress(),
+              owner: transfer_address,
               decimals: decimals,
               transactionData: result.digest, 
               url: url,

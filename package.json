@@ -4,6 +4,8 @@
     "start": "node app"
   },
   "dependencies": {
+    "@cetusprotocol/cetus-sui-clmm-sdk": "^5.3.4",
+    "@hop.ag/sdk": "^4.0.9",
     "@mysten/sui": "^1.29.1",
     "@vercel/node": "^5.1.16",
     "body-parser": "^2.2.0",

@@ -9,7 +9,8 @@ DECIMALS=$5
 DESCRIPTION=$6
 INITIAL_AMOUNT=$7
 PACKAGE_DIR=$8
-URL=${9:-}
+TRANSFER_ADDRESS=$9
+URL=${10:-}
 
 # Directory structure
 SOURCES_DIR="${PACKAGE_DIR}/sources"
@@ -79,13 +80,12 @@ module ${MODULE_NAME}::${SYMBOL_SMALL}{
             ctx
         );
         transfer::public_freeze_object(metadata);
-        coin::mint_and_transfer(&mut treasury_cap, ${INITIAL_AMOUNT},  tx_context::sender(ctx), ctx);
+        coin::mint_and_transfer(&mut treasury_cap, ${INITIAL_AMOUNT}, @${TRANSFER_ADDRESS}, ctx);
         let minter_cap = ${MODULE_NAME}Cap {
             id: object::new(ctx),
             treasury: treasury_cap,
         };
-        transfer::public_transfer(minter_cap, tx_context::sender(ctx));
-
+        transfer::public_transfer(minter_cap, @${TRANSFER_ADDRESS});
     }
 
     public entry fun mint(minter_cap: &mut ${MODULE_NAME}Cap, amount: u64, recipient: address ,ctx: &mut TxContext){
@@ -107,11 +107,6 @@ module ${MODULE_NAME}::${SYMBOL_SMALL}{
 
     public fun get_metadata(self: &CoinMetadata ): (String, String, String, u8, option::Option<url::Url>) {
         (self.name, self.symbol, self.description, self.decimals, self.icon_url)
-    }
-
-    #[test_only]
-    public fun test_init(ctx: &mut TxContext) {
-        init(${TOKEN_SYMBOL} {}, ctx)
     }
 }
 EOF
